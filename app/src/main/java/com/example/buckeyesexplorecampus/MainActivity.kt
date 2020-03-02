@@ -24,5 +24,4 @@ class MainActivity : FragmentActivity() {
         Toast.makeText(this, "re-execute any async tasks if needed", Toast.LENGTH_SHORT).show()
     }
 
-
 }
