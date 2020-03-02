@@ -18,10 +18,8 @@ class MainActivity : FragmentActivity() {
             .commit()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        Toast.makeText(this, "re-execute any async tasks if needed", Toast.LENGTH_SHORT).show()
-    }
-
+//    override fun onResume() {
+//        super.onResume()
+//        Toast.makeText(this, "re-execute any async tasks if needed", Toast.LENGTH_SHORT).show()
+//    }
 }
