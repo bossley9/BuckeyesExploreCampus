@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "711780434167",
+    "firebase_url": "https://buckeyesexplorecampus.firebaseio.com",
+    "project_id": "buckeyesexplorecampus",
+    "storage_bucket": "buckeyesexplorecampus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711780434167:android:e6a9b6167172715adf13f2",
+        "android_client_info": {
+          "package_name": "com.example.buckeyesexplorecampus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711780434167-bev829qdker0jn13lqh931dpnp8ng3qn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB530FGECdf49Ku-6kuZQGJ0qKbwJGS0S4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711780434167-bev829qdker0jn13lqh931dpnp8ng3qn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
