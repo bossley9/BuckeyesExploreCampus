@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 
@@ -34,6 +35,16 @@ class LoginFragment : Fragment() {
         val loginSubmit = view.findViewById(R.id.loginSubmit) as Button
         loginSubmit.setOnClickListener {
             // TODO add login validation
+
+            val usernameField = view.findViewById(R.id.username) as EditText
+            val username = usernameField.text
+
+            val passwordField = view.findViewById(R.id.password) as EditText
+            val password = passwordField.text
+
+            val testStr = "username is " + username + " and password is " + password
+            Toast.makeText(activity, testStr, Toast.LENGTH_SHORT).show()
+
             val menuFragment = MenuFragment()
             fragmentManager
                 ?.beginTransaction()

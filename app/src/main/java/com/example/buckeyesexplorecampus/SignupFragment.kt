@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 
 /**
@@ -21,12 +22,17 @@ class SignupFragment : Fragment() {
 
         val signupSubmit = view.findViewById(R.id.signupSubmit) as Button
         signupSubmit.setOnClickListener {
-            val menuFragment = MenuFragment()
 
-            fragmentManager
-                ?.beginTransaction()
-                ?.replace(R.id.fragmentContainer, menuFragment)
-                ?.commit()
+            if (areFieldsValid()) {
+                val menuFragment = MenuFragment()
+
+                fragmentManager
+                    ?.beginTransaction()
+                    ?.replace(R.id.fragmentContainer, menuFragment)
+                    ?.commit()
+
+            }
+
         }
 
         val loginRedirect = view.findViewById(R.id.loginRedirect) as Button
@@ -40,5 +46,21 @@ class SignupFragment : Fragment() {
         }
 
         return view
+    }
+
+    /**
+     * validate all signup fields with basic checks for creating a new user
+     */
+    private fun areFieldsValid(): Boolean {
+        val usernameField = view?.findViewById(R.id.username) as EditText
+        val username = usernameField.text
+
+        // all fields non-null
+
+        // email is valid
+        // emails match
+        // passwords match
+        // username is not taken
+        return true
     }
 }
