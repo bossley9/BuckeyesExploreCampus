@@ -1,34 +1,30 @@
 package com.example.buckeyesexplorecampus
 
-import android.content.Context
+import android.app.AlertDialog
+import android.content.ContentValues.TAG
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.Button
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.buckeyesexplorecampus.dummy.DummyContent
 import com.example.buckeyesexplorecampus.dummy.DummyContent.DummyItem
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import android.util.Log
+import android.widget.Toast
 
 /**
  * The main screen fragment.
  */
 class LandmarkMenuFragment : Fragment() {
-
-    private var columnCount = 1
-
+    private var columnCount = 3
     private var listener: OnListFragmentInteractionListener? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-//        arguments?.let {
-//            columnCount = it.getInt(ARG_COLUMN_COUNT)
-//        }
-    }
+    private lateinit var rv: RecyclerView
+    val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,66 +32,109 @@ class LandmarkMenuFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_landmark_menu, container, false)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = LandmarkRecyclerViewAdapter(DummyContent.ITEMS, listener)
-            }
-        }
-        return view
-    }
-    /*
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnListFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
-        }
-    }
-    */
-    /*
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
-    }
-    */
+        // recycler view
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson
-     * [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
+        rv = view.findViewById(R.id.recyclerView) as RecyclerView
+        rv.setHasFixedSize(true)
+        rv.layoutManager = GridLayoutManager(context, columnCount)
+        rv.adapter = LandmarkRecyclerViewAdapter(DummyContent.ITEMS, listener)
+
+        // crud buttons
+
+        val createButton: Button? = view.findViewById(R.id.createButton)
+        val retrieveButton: Button? = view.findViewById(R.id.retrieveButton)
+        val updateButton: Button? = view.findViewById(R.id.updateButton)
+        val deleteButton: Button? = view.findViewById(R.id.deleteButton)
+
+
+        createButton?.setOnClickListener { _ ->
+            val data = hashMapOf(
+                "username" to "Test User",
+                "password" to "Test Password"
+            )
+
+            db.collection("users").document("Test User").set(data)
+                .addOnSuccessListener { _ ->
+                    Log.d("Firebase Add", "DocumentSnapshot written with ID: Test User")
+                }
+                .addOnFailureListener { e ->
+                    Log.d("Firebase Add", "Error adding document", e)
+                }
+
+        }
+
+
+        retrieveButton?.setOnClickListener { _ ->
+            val docRef = db.collection("users").document("Test User")
+
+            docRef.get()
+                .addOnSuccessListener { document ->
+                    if (document != null) {
+                        Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                        val docUsername : String = document.get("username") as String
+                        Toast.makeText(activity, "username: " + docUsername, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Log.d(TAG, "No such document")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
+                }
+        }
+
+        updateButton?.setOnClickListener { _ ->
+            val data = hashMapOf("username" to "Updated Test Username")
+
+            db.collection("users").document("Test User")
+                .set(data, SetOptions.merge())
+        }
+
+        deleteButton?.setOnClickListener { _ ->
+            db.collection("users").document("Test User")
+                .delete()
+                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+        }
+
+// logout
+
+        val logoutSubmit = view.findViewById(R.id.logoutSubmit) as Button
+        logoutSubmit.setOnClickListener {
+            AlertDialog.Builder(context)
+                .setMessage("are you sure you would like to logout?")
+                .setPositiveButton("logout") { _, _ ->
+                    val loginFragment = LoginFragment()
+                    fragmentManager
+                        ?.beginTransaction()
+                        ?.replace(R.id.fragmentContainer, loginFragment)
+                        ?.commit()
+                }
+                .setNegativeButton("cancel", null)
+                .show()
+        }
+
+        // delete account
+
+        val deleteSubmit = view.findViewById(R.id.deleteSubmit) as Button
+        deleteSubmit.setOnClickListener {
+            AlertDialog.Builder(context)
+                .setMessage("are you sure you would like to delete your account? (warning: this cannot be undone!)")
+                .setPositiveButton("delete my account") { _, _ ->
+                    val loginFragment = LoginFragment()
+                    fragmentManager
+                        ?.beginTransaction()
+                        ?.replace(R.id.fragmentContainer, loginFragment)
+                        ?.commit()
+                }
+                .setNegativeButton("cancel", null)
+                .show()
+        }
+
+        return view
+
+    }
 
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun onListFragmentInteraction(item: DummyItem?)
     }
-
-    /*
-    companion object {
-
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
-
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int) =
-            LandmarkFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                }
-            }
-    }
-    */
 }

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "711780434167-t2kq80t1hhc21ttls7g0sclfbrkilc50.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.buckeyesexplorecampus",
+            "certificate_hash": "fc0149726a4529a5952cf5fceb353d4a51060cb7"
+          }
+        },
+        {
           "client_id": "711780434167-bev829qdker0jn13lqh931dpnp8ng3qn.apps.googleusercontent.com",
           "client_type": 3
         }
