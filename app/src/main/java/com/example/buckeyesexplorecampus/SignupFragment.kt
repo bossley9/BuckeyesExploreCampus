@@ -1,7 +1,6 @@
 package com.example.buckeyesexplorecampus
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -27,11 +26,11 @@ class SignupFragment : Fragment() {
         signupSubmit.setOnClickListener {
 
             if (areFieldsValid()) {
-                val menuFragment = MenuFragment()
+                val landmarkFragment = LandmarkMenuFragment()
 
                 fragmentManager
                     ?.beginTransaction()
-                    ?.replace(R.id.fragmentContainer, menuFragment)
+                    ?.replace(R.id.fragmentContainer, landmarkFragment)
                     ?.commit()
 
             } else {
