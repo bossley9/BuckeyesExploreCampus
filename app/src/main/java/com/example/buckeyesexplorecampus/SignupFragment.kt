@@ -1,7 +1,6 @@
 package com.example.buckeyesexplorecampus
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +13,9 @@ import android.widget.Toast
  * A [Fragment] subclass which handles user creation.
  */
 class SignupFragment : Fragment() {
+
+    var error = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -24,13 +26,15 @@ class SignupFragment : Fragment() {
         signupSubmit.setOnClickListener {
 
             if (areFieldsValid()) {
-                val menuFragment = MenuFragment()
+                val landmarkFragment = LandmarkMenuFragment()
 
                 fragmentManager
                     ?.beginTransaction()
-                    ?.replace(R.id.fragmentContainer, menuFragment)
+                    ?.replace(R.id.fragmentContainer, landmarkFragment)
                     ?.commit()
 
+            } else {
+                Toast.makeText(activity, error, Toast.LENGTH_LONG).show()
             }
 
         }
@@ -52,15 +56,58 @@ class SignupFragment : Fragment() {
      * validate all signup fields with basic checks for creating a new user
      */
     private fun areFieldsValid(): Boolean {
+        var isValid = false
+
         val usernameField = view?.findViewById(R.id.username) as EditText
-        val username = usernameField.text
+        val username = usernameField.text.toString()
+
+        val emailField = view?.findViewById(R.id.email) as EditText
+        val email = emailField.text.toString()
+
+        val emailField2 = view?.findViewById(R.id.email2) as EditText
+        val email2 = emailField2.text.toString()
+
+        val passwordField = view?.findViewById(R.id.password) as EditText
+        val password = passwordField.text.toString()
+
+        val passwordField2 = view?.findViewById(R.id.password) as EditText
+        val password2 = passwordField2.text.toString()
 
         // all fields non-null
 
+        if (username.isNullOrEmpty() ||
+            email.isNullOrEmpty() ||
+            email2.isNullOrEmpty() ||
+            password.isNullOrEmpty() ||
+            password2.isNullOrEmpty()) {
+            error = "at least one field is empty"
+            return isValid
+        }
+
         // email is valid
+
+        if (!email.contains("@")) {
+            error = "email is invalid"
+            return isValid
+        }
+
         // emails match
+
+        if (email != email2) {
+            error = "emails do not match"
+            return isValid
+        }
+
         // passwords match
-        // username is not taken
-        return true
+
+        if (password != password2) {
+            error = "passwords do not match"
+            return isValid
+        }
+
+        // TODO username is not taken
+
+        isValid = true
+        return isValid
     }
 }

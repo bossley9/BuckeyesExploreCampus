@@ -1,9 +1,7 @@
 package com.example.buckeyesexplorecampus
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -45,11 +43,10 @@ class LoginFragment : Fragment() {
             val testStr = "username is " + username + " and password is " + password
             Toast.makeText(activity, testStr, Toast.LENGTH_SHORT).show()
 
-            val menuFragment = MenuFragment()
+            val landmarkFragment = LandmarkMenuFragment()
             fragmentManager
                 ?.beginTransaction()
-                ?.replace(R.id.fragmentContainer, menuFragment)
-                ?.addToBackStack(null)
+                ?.replace(R.id.fragmentContainer, landmarkFragment)
                 ?.commit()
         }
 
