@@ -11,11 +11,11 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val loginFragment = LoginFragment()
+        val menuFragment = MenuFragment()
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.fragmentContainer, loginFragment)
+            .add(R.id.fragmentContainer, menuFragment)
             .commit()
     }
 
