@@ -96,35 +96,27 @@ class LandmarkMenuFragment : Fragment() {
                 .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
         }
 
-// logout
-
+        // logout
         val logoutSubmit = view.findViewById(R.id.logoutSubmit) as Button
         logoutSubmit.setOnClickListener {
             AlertDialog.Builder(context)
                 .setMessage("are you sure you would like to logout?")
                 .setPositiveButton("logout") { _, _ ->
-                    val loginFragment = LoginFragment()
-                    fragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.fragmentContainer, loginFragment)
-                        ?.commit()
+                    val act: MainActivity? = activity as? MainActivity
+                    act?.signOut()
                 }
                 .setNegativeButton("cancel", null)
                 .show()
         }
 
         // delete account
-
         val deleteSubmit = view.findViewById(R.id.deleteSubmit) as Button
         deleteSubmit.setOnClickListener {
             AlertDialog.Builder(context)
                 .setMessage("are you sure you would like to delete your account? (warning: this cannot be undone!)")
                 .setPositiveButton("delete my account") { _, _ ->
-                    val loginFragment = LoginFragment()
-                    fragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.fragmentContainer, loginFragment)
-                        ?.commit()
+                    val act: MainActivity? = activity as? MainActivity
+                    act?.deleteAccount()
                 }
                 .setNegativeButton("cancel", null)
                 .show()
