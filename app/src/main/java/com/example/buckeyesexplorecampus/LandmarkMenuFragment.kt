@@ -39,63 +39,6 @@ class LandmarkMenuFragment : Fragment() {
         rv.layoutManager = GridLayoutManager(context, columnCount)
         rv.adapter = LandmarkRecyclerViewAdapter(DummyContent.ITEMS, listener)
 
-        // crud buttons
-
-        val createButton: Button? = view.findViewById(R.id.createButton)
-        val retrieveButton: Button? = view.findViewById(R.id.retrieveButton)
-        val updateButton: Button? = view.findViewById(R.id.updateButton)
-        val deleteButton: Button? = view.findViewById(R.id.deleteButton)
-
-
-        createButton?.setOnClickListener { _ ->
-            val data = hashMapOf(
-                "username" to "Test User",
-                "password" to "Test Password"
-            )
-
-            db.collection("users").document("Test User").set(data)
-                .addOnSuccessListener { _ ->
-                    Log.d("Firebase Add", "DocumentSnapshot written with ID: Test User")
-                }
-                .addOnFailureListener { e ->
-                    Log.d("Firebase Add", "Error adding document", e)
-                }
-
-        }
-
-
-        retrieveButton?.setOnClickListener { _ ->
-            val docRef = db.collection("users").document("Test User")
-
-            docRef.get()
-                .addOnSuccessListener { document ->
-                    if (document != null) {
-                        Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                        val docUsername : String = document.get("username") as String
-                        Toast.makeText(activity, "username: " + docUsername, Toast.LENGTH_SHORT).show()
-                    } else {
-                        Log.d(TAG, "No such document")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
-                }
-        }
-
-        updateButton?.setOnClickListener { _ ->
-            val data = hashMapOf("username" to "Updated Test Username")
-
-            db.collection("users").document("Test User")
-                .set(data, SetOptions.merge())
-        }
-
-        deleteButton?.setOnClickListener { _ ->
-            db.collection("users").document("Test User")
-                .delete()
-                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-        }
-
         // logout
         val logoutSubmit = view.findViewById(R.id.logoutSubmit) as Button
         logoutSubmit.setOnClickListener {
