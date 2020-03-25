@@ -10,21 +10,19 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.buckeyesexplorecampus.dummy.DummyContent
-import com.example.buckeyesexplorecampus.dummy.DummyContent.DummyItem
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.firestore.GeoPoint
 
 /**
  * The main screen fragment.
  */
 class LandmarkMenuFragment : Fragment() {
-    private var columnCount = 3
+    private var columnCount = 2
     private var listener: OnListFragmentInteractionListener? = null
     private lateinit var rv: RecyclerView
-    val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,11 +31,13 @@ class LandmarkMenuFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_landmark_menu, container, false)
 
         // recycler view
-
         rv = view.findViewById(R.id.recyclerView) as RecyclerView
+
         rv.setHasFixedSize(true)
         rv.layoutManager = GridLayoutManager(context, columnCount)
-        rv.adapter = LandmarkRecyclerViewAdapter(DummyContent.ITEMS, listener)
+
+        // retrieve landmarks
+        retrieveLandmarks()
 
         // logout
         val logoutSubmit = view.findViewById(R.id.logoutSubmit) as Button
@@ -70,6 +70,41 @@ class LandmarkMenuFragment : Fragment() {
     }
 
     interface OnListFragmentInteractionListener {
-        fun onListFragmentInteraction(item: DummyItem?)
+        fun onListFragmentInteraction(item: Landmark?)
+    }
+
+    private fun retrieveLandmarks() {
+        val list : ArrayList<Landmark> = ArrayList()
+        Toast.makeText(activity, "retrieving landmarks...", Toast.LENGTH_SHORT).show()
+
+        db.collection("landmarks")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (doc in documents) {
+                    val name: String? = doc.get("name") as String?
+                    val fact: String? = doc.get("fact") as String?
+                    val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
+                    val lat: Double? = geopoint?.latitude
+                    val long: Double? = geopoint?.longitude
+
+                    if (name != null &&
+                        fact != null &&
+                        lat != null &&
+                        long != null) {
+
+                      val item = Landmark(doc.id, name, fact, lat, long)
+                      list.add(item)
+                    }
+                }
+                rv.adapter = LandmarkRecyclerViewAdapter(list, listener)
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        retrieveLandmarks()
     }
 }
