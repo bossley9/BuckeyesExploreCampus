@@ -86,13 +86,15 @@ class LandmarkMenuFragment : Fragment() {
                     val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
                     val lat: Double? = geopoint?.latitude
                     val long: Double? = geopoint?.longitude
+                    val imgUrl: String? = doc.get("imgUrl") as String?
 
                     if (name != null &&
                         fact != null &&
                         lat != null &&
-                        long != null) {
+                        long != null &&
+                        imgUrl != null) {
 
-                      val item = Landmark(doc.id, name, fact, lat, long)
+                      val item = Landmark(doc.id, name, fact, lat, long, imgUrl)
                       list.add(item)
                     }
                 }
