@@ -98,7 +98,7 @@ class LandmarkMenuFragment : Fragment() {
                       list.add(item)
                     }
                 }
-                rv.adapter = LandmarkRecyclerViewAdapter(list, listener)
+                rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
             }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "get failed with ", exception)

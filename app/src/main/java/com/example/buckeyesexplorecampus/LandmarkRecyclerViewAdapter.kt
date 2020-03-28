@@ -1,27 +1,27 @@
 package com.example.buckeyesexplorecampus
 
-import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.buckeyesexplorecampus.LandmarkMenuFragment.OnListFragmentInteractionListener
-import com.squareup.picasso.Picasso
+import com.firebase.ui.storage.images.FirebaseImageLoader
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_landmark.view.*
-import kotlin.coroutines.coroutineContext
-import kotlin.math.acos
+
 
 /**
  * [RecyclerView.Adapter] lays out the display for a [Landmark] in the main menu.
  */
 class LandmarkRecyclerViewAdapter(
     private val mValues: List<Landmark>,
-    private val mListener: OnListFragmentInteractionListener?
+    private val mListener: OnListFragmentInteractionListener?,
+    private val mParentFragment: Fragment?
 ) : RecyclerView.Adapter<LandmarkRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
@@ -46,9 +46,17 @@ class LandmarkRecyclerViewAdapter(
         holder.mIdView.text = item.name
         holder.mContentView.text = item.fact
 
-        val imgUri : Uri = item.imgUrl.toUri()
-        holder.mImagePreview.setImageURI(imgUri)
-        
+        // Reference to item's image file in Cloud Storage
+        val storageReference: StorageReference = FirebaseStorage.getInstance().getReferenceFromUrl(item.imgUrl)
+
+        // Load the image using Glide
+        if (mParentFragment != null) {
+            Glide.with(mParentFragment) //Context used is the parent fragment's, this is the lifecycle the image will follow
+                .load(storageReference)
+                .into(holder.mImagePreview)
+        }
+
+
         with(holder.mView) {
             tag = item
             setOnClickListener(mOnClickListener)
