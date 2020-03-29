@@ -24,7 +24,12 @@ class MainActivity : FragmentActivity() {
                 .beginTransaction()
                 .add(R.id.fragmentContainer, LandmarkMenuFragment())
                 .commit()
+//            supportFragmentManager
+//                .beginTransaction()
+//                .add(R.id.fragmentContainer, CameraFragment())
+//                .commit()
         } else {
+
             // sign in first
             createSignInIntent()
         }
