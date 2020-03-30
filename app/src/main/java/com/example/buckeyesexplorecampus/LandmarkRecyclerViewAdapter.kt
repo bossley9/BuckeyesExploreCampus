@@ -46,6 +46,11 @@ class LandmarkRecyclerViewAdapter(
         holder.mIdView.text = item.name
         holder.mContentView.text = item.fact
 
+        holder.mImagePreview.setOnClickListener {
+            val parent : LandmarkMenuFragment = mParentFragment as LandmarkMenuFragment
+            parent.openCamera()
+        }
+
         // Reference to item's image file in Cloud Storage
         val storageReference: StorageReference = FirebaseStorage.getInstance().getReferenceFromUrl(item.imgUrl)
 

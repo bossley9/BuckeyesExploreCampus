@@ -105,6 +105,13 @@ class LandmarkMenuFragment : Fragment() {
             }
     }
 
+    fun openCamera() {
+        fragmentManager
+            ?.beginTransaction()
+            ?.add(R.id.fragmentContainer, CameraFragment())
+            ?.commit()
+    }
+
     override fun onResume() {
         super.onResume()
         retrieveLandmarks()
