@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.buckeyesexplorecampus.LandmarkMenuFragment.OnListFragmentInteractionListener
-import com.firebase.ui.storage.images.FirebaseImageLoader
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_landmark.view.*
@@ -71,7 +70,7 @@ class LandmarkRecyclerViewAdapter(
     override fun getItemCount(): Int = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val mIdView: TextView = mView.item_number
+        val mIdView: TextView = mView.locationName
         val mContentView: TextView = mView.content
         val mImagePreview: ImageView = mView.locationPreview
 

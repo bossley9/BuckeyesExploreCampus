@@ -8,64 +8,73 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView14"
+        android:id="@+id/instructionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="instructions"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="@string/instructions_title"
+        android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="find each picture and take the exact same picture!"
+        android:id="@+id/instructionDescription"
+        android:layout_width="337dp"
+        android:layout_height="82dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/instructions_desc"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView14" />
-
-    <TextView
-        android:id="@+id/textView15"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="pictures found:"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+        app:layout_constraintTop_toBottomOf="@+id/instructionTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:name="com.example.buckeyesexplorecampus.LandmarkFragment"
-        android:layout_width="353dp"
-        android:layout_height="569dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layoutManager="LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView15"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@+id/instructionDescription"
         tools:context=".LandmarkMenuFragment"
         tools:listitem="@layout/fragment_landmark">
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <Button
-        android:id="@+id/logoutSubmit"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/buttonSubmit"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="log out"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView"
+        app:layout_constraintVertical_bias="1.0">
 
-    <Button
-        android:id="@+id/deleteSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="delete account"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoutSubmit" />
+        <Button
+            android:id="@+id/logoutSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/logout_account" />
+
+        <Button
+            android:id="@+id/deleteSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_account" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,17 +3,18 @@ package com.example.buckeyesexplorecampus
 import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import android.util.Log
-import android.widget.Toast
 import com.google.firebase.firestore.GeoPoint
+
 
 /**
  * The main screen fragment.
@@ -42,31 +43,24 @@ class LandmarkMenuFragment : Fragment() {
         // logout
         val logoutSubmit = view.findViewById(R.id.logoutSubmit) as Button
         logoutSubmit.setOnClickListener {
-            AlertDialog.Builder(context)
-                .setMessage("are you sure you would like to logout?")
-                .setPositiveButton("logout") { _, _ ->
-                    val act: MainActivity? = activity as? MainActivity
-                    act?.signOut()
-                }
-                .setNegativeButton("cancel", null)
-                .show()
+            val act: MainActivity? = activity as? MainActivity
+            act?.signOut()
         }
 
         // delete account
         val deleteSubmit = view.findViewById(R.id.deleteSubmit) as Button
         deleteSubmit.setOnClickListener {
             AlertDialog.Builder(context)
-                .setMessage("are you sure you would like to delete your account? (warning: this cannot be undone!)")
-                .setPositiveButton("delete my account") { _, _ ->
+                .setMessage(R.string.delete_account_confirmation)
+                .setPositiveButton(R.string.delete_account) { _, _ ->
                     val act: MainActivity? = activity as? MainActivity
                     act?.deleteAccount()
                 }
-                .setNegativeButton("cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show()
         }
 
         return view
-
     }
 
     interface OnListFragmentInteractionListener {
@@ -75,7 +69,6 @@ class LandmarkMenuFragment : Fragment() {
 
     private fun retrieveLandmarks() {
         val list : ArrayList<Landmark> = ArrayList()
-        Toast.makeText(activity, "retrieving landmarks...", Toast.LENGTH_SHORT).show()
 
         db.collection("landmarks")
             .get()
@@ -101,7 +94,7 @@ class LandmarkMenuFragment : Fragment() {
                 rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
             }
             .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with ", exception)
+                Log.d(TAG, "Get failed with exception", exception)
             }
     }
 
