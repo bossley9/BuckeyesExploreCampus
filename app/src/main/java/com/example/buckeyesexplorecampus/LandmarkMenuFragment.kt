@@ -109,6 +109,7 @@ class LandmarkMenuFragment : Fragment() {
         fragmentManager
             ?.beginTransaction()
             ?.add(R.id.fragmentContainer, CameraFragment())
+            ?.addToBackStack("camera")
             ?.commit()
     }
 

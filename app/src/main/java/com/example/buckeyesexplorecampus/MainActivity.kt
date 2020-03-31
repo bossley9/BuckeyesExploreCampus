@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 
 class MainActivity : FragmentActivity() {
@@ -19,17 +21,15 @@ class MainActivity : FragmentActivity() {
         // TODO if not online
 
         if (isSignedIn()) {
+            // connect signed in user to data in Firestore
+            findOrCreateUserObj()
+
             // create main screen fragment
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragmentContainer, LandmarkMenuFragment())
                 .commit()
-//            supportFragmentManager
-//                .beginTransaction()
-//                .add(R.id.fragmentContainer, CameraFragment())
-//                .commit()
         } else {
-
             // sign in first
             createSignInIntent()
         }
@@ -39,6 +39,17 @@ class MainActivity : FragmentActivity() {
     private fun isSignedIn() : Boolean {
         val user = FirebaseAuth.getInstance().currentUser
         return user != null
+    }
+
+    private fun findOrCreateUserObj() {
+        val db = FirebaseFirestore.getInstance()
+        val users = db.collection("users")
+
+        val user = FirebaseAuth.getInstance().currentUser
+
+        // create user obj if it does not exist
+        val data = hashMapOf("successfulLandmarks" to arrayListOf<String>())
+        users.document(user?.uid as String).set(data, SetOptions.merge())
     }
 
     private fun createSignInIntent() {

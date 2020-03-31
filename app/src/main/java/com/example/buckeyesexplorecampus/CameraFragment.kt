@@ -26,11 +26,11 @@ import java.io.IOException
  */
 class CameraFragment : Fragment() {
 
-    val REQUEST_IMAGE_CAPTURE = 1
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    companion object {
+        private const val REQUEST_IMAGE_CAPTURE = 1
     }
+
+    // TODO https://stackoverflow.com/questions/32205352/open-camera-inside-fragment
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,20 +39,18 @@ class CameraFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_camera, container, false)
 
+        val goBackButton: Button? = view.findViewById(R.id.goBackButton)
         val takePictureButton: Button? = view.findViewById(R.id.takePictureButton)
         val displayPictureButton: Button? = view.findViewById(R.id.displayPictureButton)
         val displayImageView : ImageView? = view.findViewById(R.id.displayImage)
 
+        goBackButton?.setOnClickListener { _ ->
+            fragmentManager
+                ?.popBackStack()
+        }
 
         takePictureButton?.setOnClickListener{ _ ->
-
-            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-                activity?.packageManager?.let {
-                    takePictureIntent.resolveActivity(it)?.also {
-                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-                    }
-                }
-            }
+            startCameraIntent()
         }
 
         displayPictureButton?.setOnClickListener {
@@ -83,18 +81,27 @@ class CameraFragment : Fragment() {
         return view
     }
 
+    private fun startCameraIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            activity?.packageManager?.let {
+                takePictureIntent.resolveActivity(it)?.also {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+                }
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val extras = data?.extras
             val imageBitmap = extras!!["data"] as Bitmap?
-            // mImageLabel.setImageBitmap(imageBitmap)
             if (imageBitmap != null) {
                 encodeBitmapAndSaveToFirebase(imageBitmap)
             }
         }
     }
 
-    fun encodeBitmapAndSaveToFirebase(bitmap: Bitmap) {
+    private fun encodeBitmapAndSaveToFirebase(bitmap: Bitmap) {
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val imageEncoded: String = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
