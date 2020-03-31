@@ -19,7 +19,7 @@ import com.google.firebase.firestore.GeoPoint
  * The main screen fragment.
  */
 class LandmarkMenuFragment : Fragment() {
-    private var columnCount = 2
+    private var columnCount = 3
     private var listener: OnListFragmentInteractionListener? = null
     private lateinit var rv: RecyclerView
     private val db = FirebaseFirestore.getInstance()
