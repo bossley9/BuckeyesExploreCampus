@@ -1,6 +1,12 @@
 <resources>
-    <string name="app_name">BuckeyesExploreCampus</string>
+    <string name="app_name">Buckeyes Explore Campus</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="instructions_title">Instructions</string>
+    <string name="instructions_desc">Find the location where each photo was taken and take the exact same picture to reveal campus facts about that location.</string>
+
+    <string name="logout_account">Log Out</string>
+    <string name="delete_account">Delete My Account</string>
+    <string name="delete_account_confirmation">Are you sure you would like to delete your account? (Warning: This cannot be undone.)</string>
+
+    <string name="cancel">Cancel</string>
 </resources>

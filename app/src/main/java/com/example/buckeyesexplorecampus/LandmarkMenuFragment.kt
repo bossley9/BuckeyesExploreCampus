@@ -3,19 +3,18 @@ package com.example.buckeyesexplorecampus
 import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.buckeyesexplorecampus.dummy.DummyContent
-import com.example.buckeyesexplorecampus.dummy.DummyContent.DummyItem
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import android.util.Log
-import android.widget.Toast
+import com.google.firebase.firestore.GeoPoint
+
 
 /**
  * The main screen fragment.
@@ -24,7 +23,7 @@ class LandmarkMenuFragment : Fragment() {
     private var columnCount = 3
     private var listener: OnListFragmentInteractionListener? = null
     private lateinit var rv: RecyclerView
-    val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,100 +32,82 @@ class LandmarkMenuFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_landmark_menu, container, false)
 
         // recycler view
-
         rv = view.findViewById(R.id.recyclerView) as RecyclerView
+
         rv.setHasFixedSize(true)
         rv.layoutManager = GridLayoutManager(context, columnCount)
-        rv.adapter = LandmarkRecyclerViewAdapter(DummyContent.ITEMS, listener)
 
-        // crud buttons
-
-        val createButton: Button? = view.findViewById(R.id.createButton)
-        val retrieveButton: Button? = view.findViewById(R.id.retrieveButton)
-        val updateButton: Button? = view.findViewById(R.id.updateButton)
-        val deleteButton: Button? = view.findViewById(R.id.deleteButton)
-
-
-        createButton?.setOnClickListener { _ ->
-            val data = hashMapOf(
-                "username" to "Test User",
-                "password" to "Test Password"
-            )
-
-            db.collection("users").document("Test User").set(data)
-                .addOnSuccessListener { _ ->
-                    Log.d("Firebase Add", "DocumentSnapshot written with ID: Test User")
-                }
-                .addOnFailureListener { e ->
-                    Log.d("Firebase Add", "Error adding document", e)
-                }
-
-        }
-
-
-        retrieveButton?.setOnClickListener { _ ->
-            val docRef = db.collection("users").document("Test User")
-
-            docRef.get()
-                .addOnSuccessListener { document ->
-                    if (document != null) {
-                        Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                        val docUsername : String = document.get("username") as String
-                        Toast.makeText(activity, "username: " + docUsername, Toast.LENGTH_SHORT).show()
-                    } else {
-                        Log.d(TAG, "No such document")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d(TAG, "get failed with ", exception)
-                }
-        }
-
-        updateButton?.setOnClickListener { _ ->
-            val data = hashMapOf("username" to "Updated Test Username")
-
-            db.collection("users").document("Test User")
-                .set(data, SetOptions.merge())
-        }
-
-        deleteButton?.setOnClickListener { _ ->
-            db.collection("users").document("Test User")
-                .delete()
-                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-        }
+        // retrieve landmarks
+        retrieveLandmarks()
 
         // logout
         val logoutSubmit = view.findViewById(R.id.logoutSubmit) as Button
         logoutSubmit.setOnClickListener {
-            AlertDialog.Builder(context)
-                .setMessage("are you sure you would like to logout?")
-                .setPositiveButton("logout") { _, _ ->
-                    val act: MainActivity? = activity as? MainActivity
-                    act?.signOut()
-                }
-                .setNegativeButton("cancel", null)
-                .show()
+            val act: MainActivity? = activity as? MainActivity
+            act?.signOut()
         }
 
         // delete account
         val deleteSubmit = view.findViewById(R.id.deleteSubmit) as Button
         deleteSubmit.setOnClickListener {
             AlertDialog.Builder(context)
-                .setMessage("are you sure you would like to delete your account? (warning: this cannot be undone!)")
-                .setPositiveButton("delete my account") { _, _ ->
+                .setMessage(R.string.delete_account_confirmation)
+                .setPositiveButton(R.string.delete_account) { _, _ ->
                     val act: MainActivity? = activity as? MainActivity
                     act?.deleteAccount()
                 }
-                .setNegativeButton("cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show()
         }
 
         return view
-
     }
 
     interface OnListFragmentInteractionListener {
-        fun onListFragmentInteraction(item: DummyItem?)
+        fun onListFragmentInteraction(item: Landmark?)
+    }
+
+    private fun retrieveLandmarks() {
+        val list : ArrayList<Landmark> = ArrayList()
+
+        db.collection("landmarks")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (doc in documents) {
+                    val name: String? = doc.get("name") as String?
+                    val fact: String? = doc.get("fact") as String?
+                    val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
+                    val lat: Double? = geopoint?.latitude
+                    val long: Double? = geopoint?.longitude
+                    val imgUrl: String? = doc.get("imgUrl") as String?
+
+                    if (name != null &&
+                        fact != null &&
+                        lat != null &&
+                        long != null &&
+                        imgUrl != null) {
+
+                      val item = Landmark(doc.id, name, fact, lat, long, imgUrl)
+                      list.add(item)
+                    }
+                }
+                rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "Get failed with exception", exception)
+            }
+    }
+
+    fun openCamera() {
+        fragmentManager
+            ?.beginTransaction()
+            ?.add(R.id.fragmentContainer, CameraFragment())
+            ?.addToBackStack("camera")
+            ?.commit()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        retrieveLandmarks()
     }
 }
