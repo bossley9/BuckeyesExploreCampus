@@ -16,7 +16,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
@@ -30,7 +32,7 @@ class CameraFragment : Fragment() {
         private const val REQUEST_IMAGE_CAPTURE = 1
     }
 
-    // TODO https://stackoverflow.com/questions/32205352/open-camera-inside-fragment
+    private lateinit var landmarkId: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,44 +41,11 @@ class CameraFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_camera, container, false)
 
-        val goBackButton: Button? = view.findViewById(R.id.goBackButton)
-        val takePictureButton: Button? = view.findViewById(R.id.takePictureButton)
-        val displayPictureButton: Button? = view.findViewById(R.id.displayPictureButton)
-        val displayImageView : ImageView? = view.findViewById(R.id.displayImage)
+        // get landmark id
+        landmarkId = arguments!!.getString("landmarkId") as String
 
-        goBackButton?.setOnClickListener { _ ->
-            fragmentManager
-                ?.popBackStack()
-        }
-
-        takePictureButton?.setOnClickListener{ _ ->
-            startCameraIntent()
-        }
-
-        displayPictureButton?.setOnClickListener {
-            val db = FirebaseFirestore.getInstance()
-            val docRef = db.collection("users").document("testUser")
-
-            if (displayImageView != null) {
-                docRef.get()
-                    .addOnSuccessListener { document ->
-                        if (document != null) {
-                            Log.d(ContentValues.TAG, "DocumentSnapshot data: ${document.data}")
-                            val picture : String = document.get("picture") as String
-
-                            val imageBitMap : Bitmap? = decodeFromFirebaseBase64(picture)
-
-                            displayImageView.setImageBitmap(imageBitMap)
-
-                        } else {
-                            Log.d(ContentValues.TAG, "No such document")
-                        }
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.d(ContentValues.TAG, "get failed with ", exception)
-                    }
-            }
-        }
+        // open camera
+        startCameraIntent()
 
         return view
     }
@@ -91,36 +60,71 @@ class CameraFragment : Fragment() {
         }
     }
 
+    private fun isValidImage(img: Bitmap): Boolean {
+        // TODO implement image comparison
+        return true
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val extras = data?.extras
             val imageBitmap = extras!!["data"] as Bitmap?
             if (imageBitmap != null) {
-                encodeBitmapAndSaveToFirebase(imageBitmap)
+
+                if (isValidImage(imageBitmap)) {
+                    addSuccessfulLandmark(imageBitmap)
+                } else {
+                    Toast.makeText(activity, "Images do not match. Try again!", Toast.LENGTH_LONG).show()
+                    // close camera fragment
+                    fragmentManager?.popBackStack()
+                }
+
             }
         }
     }
 
-    private fun encodeBitmapAndSaveToFirebase(bitmap: Bitmap) {
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-        val imageEncoded: String = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
+    private fun addSuccessfulLandmark(bitmap: Bitmap) {
+        // encode image
+        val imgEncoded: String = encodeBitmap(bitmap)
 
+        // get user
+        val user = FirebaseAuth.getInstance().currentUser
+
+        // create map pair from landmark id to encoded image
         val data = hashMapOf(
-            "picture" to imageEncoded
+            "successfulLandmarks" to hashMapOf(
+                landmarkId to imgEncoded
+            )
         )
+
+        // push to Firebase
         val db = FirebaseFirestore.getInstance()
-        db.collection("users").document("testUser").set(data)
+        db.collection("users")
+            .document(user?.uid as String)
+            .set(data, SetOptions.merge())
             .addOnSuccessListener { _ ->
-                Log.d("Firebase Add", "Picture written with ID: Test User")
+                val factsFragment = FactsFragment()
+
+                fragmentManager
+                    ?.beginTransaction()
+                    ?.replace(R.id.fragmentContainer, factsFragment)
+                    ?.commit()
             }
             .addOnFailureListener { e ->
                 Log.d("Firebase Add", "Error adding picture", e)
             }
     }
 
+    // given a bitmap, encode and convert to a string
+    private fun encodeBitmap(bitmap: Bitmap): String {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+        return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
+    }
+
+    // given a string?, decode and convert to a bitmap?
     @Throws(IOException::class)
-    fun decodeFromFirebaseBase64(image: String?): Bitmap? {
+    fun decodeBitmap(image: String?): Bitmap? {
         val decodedByteArray =
             Base64.decode(image, Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)

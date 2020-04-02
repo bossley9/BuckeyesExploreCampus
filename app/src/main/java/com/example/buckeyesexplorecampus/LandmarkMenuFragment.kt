@@ -8,10 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 
@@ -68,46 +69,93 @@ class LandmarkMenuFragment : Fragment() {
     }
 
     private fun retrieveLandmarks() {
+        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
         val list : ArrayList<Landmark> = ArrayList()
 
+        // TODO use promises
         db.collection("landmarks")
             .get()
-            .addOnSuccessListener { documents ->
-                for (doc in documents) {
-                    val name: String? = doc.get("name") as String?
-                    val fact: String? = doc.get("fact") as String?
-                    val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
-                    val lat: Double? = geopoint?.latitude
-                    val long: Double? = geopoint?.longitude
-                    val imgUrl: String? = doc.get("imgUrl") as String?
+            .addOnSuccessListener { landmarks ->
 
-                    if (name != null &&
-                        fact != null &&
-                        lat != null &&
-                        long != null &&
-                        imgUrl != null) {
+                db.collection("users")
+                    .document(FirebaseAuth.getInstance().currentUser?.uid as String)
+                    .get()
+                    .addOnSuccessListener { user ->
 
-                      val item = Landmark(doc.id, name, fact, lat, long, imgUrl)
-                      list.add(item)
+                        val data = user.get("successfulLandmarks") as HashMap<*, *>?;
+                        val successfulLandmarks = HashMap<String, String>();
+
+                        if (data != null) {
+                            for ((k, v) in data) {
+                                successfulLandmarks[k as String] = v as String
+                            }
+                        }
+
+                        for (doc in landmarks) {
+                            val name: String? = doc.get("name") as String?
+                            val fact: String? = doc.get("fact") as String?
+                            val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
+                            val lat: Double? = geopoint?.latitude
+                            val long: Double? = geopoint?.longitude
+                            val imgUrl: String? = doc.get("imgUrl") as String?
+
+                            if (name != null &&
+                                fact != null &&
+                                lat != null &&
+                                long != null &&
+                                imgUrl != null) {
+
+                                // if already completed, mark as completed
+                                val isCompleted = successfulLandmarks.containsKey(doc.id)
+
+                                val item = Landmark(doc.id, name, fact, lat, long, imgUrl, isCompleted)
+                                list.add(item)
+                            }
+                        }
+
+                        rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
                     }
-                }
-                rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
+                    .addOnFailureListener { exception ->
+                        Log.d(TAG, "Get failed with exception", exception)
+                    }
             }
             .addOnFailureListener { exception ->
                 Log.d(TAG, "Get failed with exception", exception)
             }
     }
 
-    fun openCamera() {
+    fun openCamera(landmarkId: String) {
+        val cameraFragment = CameraFragment()
+
+        val args = Bundle()
+        args.putString("landmarkId", landmarkId)
+        cameraFragment.arguments = args
+
         fragmentManager
             ?.beginTransaction()
-            ?.add(R.id.fragmentContainer, CameraFragment())
-            ?.addToBackStack("camera")
+            ?.add(R.id.fragmentContainer, cameraFragment)
+//            ?.addToBackStack(null)
             ?.commit()
     }
+
+    fun openFacts(landmarkId: String) {
+        val factsFragment = FactsFragment()
+
+        val args = Bundle()
+        args.putString("landmarkId", landmarkId)
+        factsFragment.arguments = args
+
+        fragmentManager
+            ?.beginTransaction()
+            ?.add(R.id.fragmentContainer, factsFragment)
+            ?.addToBackStack(null)
+            ?.commit()
+    }
+
 
     override fun onResume() {
         super.onResume()
         retrieveLandmarks()
     }
 }
+
