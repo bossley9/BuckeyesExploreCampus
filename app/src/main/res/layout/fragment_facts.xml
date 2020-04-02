@@ -5,9 +5,77 @@
     android:layout_height="match_parent"
     tools:context=".FactsFragment">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="item fact fragment" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/landmarkTitleText"
+            android:paddingBottom="20dp"
+            android:paddingTop="20dp"
+            android:textSize="20dp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp">
+
+            <ImageView
+                android:layout_width="189dp"
+                android:layout_height="336dp"
+                android:layout_marginRight="5dp"
+                android:id="@+id/providedLandmarkImage"
+                android:scaleType="fitXY"
+                />
+
+            <ImageView
+                android:layout_width="189dp"
+                android:layout_height="336dp"
+                android:id="@+id/userLandmarkImage"
+                android:scaleType="fitXY"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/successMessageText"
+            android:paddingTop="20dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/landmarkFactText"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center|bottom"
+            android:paddingBottom="20dp">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/factsBackButton"
+                android:text="Back" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>

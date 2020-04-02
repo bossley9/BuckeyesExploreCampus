@@ -97,18 +97,18 @@ class LandmarkMenuFragment : Fragment() {
                             val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
                             val lat: Double? = geopoint?.latitude
                             val long: Double? = geopoint?.longitude
-                            val imgUrl: String? = doc.get("imgUrl") as String?
+                            val imgBase64: String? = doc.get("imgBase64") as String?
 
                             if (name != null &&
                                 fact != null &&
                                 lat != null &&
                                 long != null &&
-                                imgUrl != null) {
+                                imgBase64 != null) {
 
                                 // if already completed, mark as completed
                                 val isCompleted = successfulLandmarks.containsKey(doc.id)
 
-                                val item = Landmark(doc.id, name, fact, lat, long, imgUrl, isCompleted)
+                                val item = Landmark(doc.id, name, fact, lat, long, imgBase64, isCompleted)
                                 list.add(item)
                             }
                         }
@@ -147,7 +147,7 @@ class LandmarkMenuFragment : Fragment() {
 
         fragmentManager
             ?.beginTransaction()
-            ?.add(R.id.fragmentContainer, factsFragment)
+            ?.replace(R.id.fragmentContainer, factsFragment)
             ?.addToBackStack(null)
             ?.commit()
     }

@@ -1,5 +1,10 @@
 package com.example.buckeyesexplorecampus
 
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +14,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.buckeyesexplorecampus.LandmarkMenuFragment.OnListFragmentInteractionListener
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_landmark.view.*
+import java.io.IOException
 
 
 /**
@@ -60,21 +67,24 @@ class LandmarkRecyclerViewAdapter(
             }
         }
 
-        // Reference to item's image file in Cloud Storage
-        val storageReference: StorageReference = FirebaseStorage.getInstance().getReferenceFromUrl(item.imgUrl)
 
-        // Load the image using Glide
-        if (mParentFragment != null) {
-            Glide.with(mParentFragment) //Context used is the parent fragment's, this is the lifecycle the image will follow
-                .load(storageReference)
-                .into(holder.mImagePreview)
-        }
+        val picture : String = item.imgBase64
+        val imageBitMap : Bitmap? = decodeFromFirebaseBase64(picture)
+        holder.mImagePreview.setImageBitmap(imageBitMap)
 
 
         with(holder.mView) {
             tag = item
             setOnClickListener(mOnClickListener)
         }
+    }
+
+    //TODO: This function is resused code from Facts Fragment
+    @Throws(IOException::class)
+    fun decodeFromFirebaseBase64(image: String?): Bitmap? {
+        val decodedByteArray =
+            Base64.decode(image, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)
     }
 
     override fun getItemCount(): Int = mValues.size
