@@ -43,11 +43,21 @@ class LandmarkRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
         holder.mIdView.text = item.name
-        holder.mContentView.text = "this loc is __ mi away"
+
+        if (item.isCompleted) {
+            holder.mContentView.text = "completed!"
+        } else {
+            holder.mContentView.text = "this loc is __ mi away"
+        }
 
         holder.mImagePreview.setOnClickListener {
             val parent : LandmarkMenuFragment = mParentFragment as LandmarkMenuFragment
-            parent.openCamera(item.id)
+
+            if (item.isCompleted) {
+                parent.openFacts(item.id)
+            } else {
+                parent.openCamera(item.id)
+            }
         }
 
         // Reference to item's image file in Cloud Storage
