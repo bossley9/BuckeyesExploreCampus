@@ -28,9 +28,11 @@ class MainActivity : FragmentActivity() {
                 .beginTransaction()
                 .add(R.id.fragmentContainer, LandmarkMenuFragment())
                 .commit()
+
         } else {
             // sign in first
             createSignInIntent()
+
         }
 
     }
@@ -49,6 +51,7 @@ class MainActivity : FragmentActivity() {
         // create user obj if it does not exist
         val data = hashMapOf("successfulLandmarks" to arrayListOf<String>())
         users.document(user?.uid as String).set(data, SetOptions.merge())
+
     }
 
     private fun createSignInIntent() {
