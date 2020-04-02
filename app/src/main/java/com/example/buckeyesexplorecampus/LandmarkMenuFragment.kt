@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
@@ -68,6 +68,7 @@ class LandmarkMenuFragment : Fragment() {
     }
 
     private fun retrieveLandmarks() {
+        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
         val list : ArrayList<Landmark> = ArrayList()
 
         db.collection("landmarks")
@@ -98,11 +99,17 @@ class LandmarkMenuFragment : Fragment() {
             }
     }
 
-    fun openCamera() {
+    fun openCamera(landmarkId: String) {
+        val cameraFragment = CameraFragment()
+
+        val args = Bundle()
+        args.putString("landmarkId", landmarkId)
+        cameraFragment.arguments = args
+
         fragmentManager
             ?.beginTransaction()
-            ?.add(R.id.fragmentContainer, CameraFragment())
-            ?.addToBackStack("camera")
+            ?.add(R.id.fragmentContainer, cameraFragment)
+//            ?.addToBackStack(null)
             ?.commit()
     }
 

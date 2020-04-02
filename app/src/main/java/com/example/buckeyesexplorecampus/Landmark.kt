@@ -1,6 +1,6 @@
 package com.example.buckeyesexplorecampus
 
-class Landmark(private val id: String,
+class Landmark(val id: String,
                val name: String,
                val fact: String,
                val latitude: Double,
