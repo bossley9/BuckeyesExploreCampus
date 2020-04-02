@@ -32,18 +32,29 @@ class FactsFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_facts, container, false)
 
+        // get landmark id
+        val landmarkId = arguments!!.getString("landmarkId") as String
+
         val providedLandmarkImage : ImageView = view.findViewById(R.id.providedLandmarkImage)
         val userLandmarkImage : ImageView = view.findViewById(R.id.userLandmarkImage)
         val landmarkFactText : TextView = view.findViewById(R.id.landmarkFactText)
         val landmarkTitleText : TextView = view.findViewById(R.id.landmarkTitleText)
         val successMessageText : TextView = view.findViewById(R.id.successMessageText)
-        //TODO: Set up back button capability
         val factsBackButton : Button = view.findViewById(R.id.factsBackButton)
+
+        factsBackButton.setOnClickListener {
+            val landmarkMenuFragment = LandmarkMenuFragment()
+
+            fragmentManager
+                ?.beginTransaction()
+                ?.replace(R.id.fragmentContainer, landmarkMenuFragment)
+                ?.addToBackStack(null)
+                ?.commit()
+        }
 
 
         val db = FirebaseFirestore.getInstance()
-        //TODO: get landmark name without hardcoding
-        val landmarkDocRef = db.collection("landmarks").document("CFmjmO6nf36JL5zVTpOZ")
+        val landmarkDocRef = db.collection("landmarks").document(landmarkId)
 
         landmarkDocRef.get()
             .addOnSuccessListener { document ->

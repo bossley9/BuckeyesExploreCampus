@@ -33,12 +33,15 @@
                 android:layout_height="336dp"
                 android:layout_marginRight="5dp"
                 android:id="@+id/providedLandmarkImage"
+                android:scaleType="fitXY"
                 />
 
             <ImageView
                 android:layout_width="189dp"
                 android:layout_height="336dp"
-                android:id="@+id/userLandmarkImage"/>
+                android:id="@+id/userLandmarkImage"
+                android:scaleType="fitXY"
+                />
 
         </LinearLayout>
 
