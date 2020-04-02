@@ -82,7 +82,14 @@ class LandmarkMenuFragment : Fragment() {
                     .get()
                     .addOnSuccessListener { user ->
 
-                        val successfulLandmarks = user.get("successfulLandmarks") as HashMap<*, *>;
+                        val data = user.get("successfulLandmarks") as HashMap<*, *>?;
+                        val successfulLandmarks = HashMap<String, String>();
+
+                        if (data != null) {
+                            for ((k, v) in data) {
+                                successfulLandmarks[k as String] = v as String
+                            }
+                        }
 
                         for (doc in landmarks) {
                             val name: String? = doc.get("name") as String?
@@ -99,7 +106,7 @@ class LandmarkMenuFragment : Fragment() {
                                 imgUrl != null) {
 
                                 // if already completed, mark as completed
-                                val isCompleted = doc.id in successfulLandmarks
+                                val isCompleted = successfulLandmarks.containsKey(doc.id)
 
                                 val item = Landmark(doc.id, name, fact, lat, long, imgUrl, isCompleted)
                                 list.add(item)
@@ -151,3 +158,4 @@ class LandmarkMenuFragment : Fragment() {
         retrieveLandmarks()
     }
 }
+
