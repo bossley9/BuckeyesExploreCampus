@@ -54,7 +54,7 @@ class LandmarkRecyclerViewAdapter(
         if (item.isCompleted) {
             holder.mContentView.text = "completed!"
         } else {
-            holder.mContentView.text = "this loc is __ mi away"
+            holder.mContentView.text = item.distance.toString()
         }
 
         holder.mImagePreview.setOnClickListener {

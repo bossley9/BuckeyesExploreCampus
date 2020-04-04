@@ -6,6 +6,7 @@ class Landmark(val id: String,
                val latitude: Double,
                val longitude: Double,
                val imgBase64: String,
+               val distance: Double,
                val isCompleted: Boolean) {
 
     override fun toString(): String = id

@@ -71,6 +71,18 @@ class LandmarkMenuFragment : Fragment() {
     private fun retrieveLandmarks() {
         Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
         val list : ArrayList<Landmark> = ArrayList()
+        val bundle = this.arguments
+        var userLat = 0.0
+        var userLong = 0.0
+        var test = "nothing"
+
+        if (bundle != null) {
+            userLong = bundle.getDouble("longitude", 0.0)
+            userLat = bundle.getDouble("latitude", 0.0)
+            test = bundle.getString("hello", "nothing")
+        }
+
+        Toast.makeText(activity, test, Toast.LENGTH_LONG).show()
 
         // TODO use promises
         db.collection("landmarks")
@@ -108,7 +120,7 @@ class LandmarkMenuFragment : Fragment() {
                                 // if already completed, mark as completed
                                 val isCompleted = successfulLandmarks.containsKey(doc.id)
 
-                                val item = Landmark(doc.id, name, fact, lat, long, imgBase64, isCompleted)
+                                val item = Landmark(doc.id, name, fact, lat, long, imgBase64, userLat, isCompleted)
                                 list.add(item)
                             }
                         }

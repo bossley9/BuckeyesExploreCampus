@@ -1,37 +1,57 @@
 package com.example.buckeyesexplorecampus
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+
+private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 class MainActivity : FragmentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location : Location? ->
+                if (location == null) {
+                    Toast.makeText(applicationContext, "birthday party", Toast.LENGTH_LONG).show()
+                    requestNewLocationData()
+                } else {
+                    Toast.makeText(applicationContext, "birthday party", Toast.LENGTH_LONG).show()
+                    val arguments = Bundle()
+                    arguments.putDouble("longitude", location.longitude )
+                    arguments.putDouble("longitude", location.latitude)
+                    arguments.putString("hello", "hello")
 
-        // TODO if not online
+                    if (isSignedIn()) {
+                        // connect signed in user to data in Firestore
+                        findOrCreateUserObj()
 
-        if (isSignedIn()) {
-            // connect signed in user to data in Firestore
-            findOrCreateUserObj()
-
-            // create main screen fragment
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragmentContainer, LandmarkMenuFragment())
-                .commit()
-        } else {
-            // sign in first
-            createSignInIntent()
-        }
+                        // create main screen fragment
+                        val lmFrag = LandmarkMenuFragment()
+                        lmFrag.arguments = arguments
+                        supportFragmentManager
+                            .beginTransaction()
+                            .add(R.id.fragmentContainer, lmFrag)
+                            .commit()
+                    } else {
+                        // sign in first
+                        createSignInIntent()
+                    }
+                }
+            }
 
     }
 
@@ -109,6 +129,46 @@ class MainActivity : FragmentActivity() {
                         createSignInIntent()
                     }
             }
+    }
+
+    private fun requestNewLocationData() {
+        var mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 0
+        mLocationRequest.fastestInterval = 0
+        mLocationRequest.numUpdates = 1
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient!!.requestLocationUpdates(
+            mLocationRequest, mLocationCallback,
+            Looper.myLooper()
+        )
+    }
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            var location: Location = locationResult.lastLocation
+            val arguments = Bundle()
+            arguments.putDouble("longitude", location.longitude )
+            arguments.putDouble("longitude", location.latitude)
+            arguments.putString("hello", "hello")
+
+            if (isSignedIn()) {
+                // connect signed in user to data in Firestore
+                findOrCreateUserObj()
+
+                // create main screen fragment
+                val lmFrag = LandmarkMenuFragment()
+                lmFrag.arguments = arguments
+                supportFragmentManager
+                    .beginTransaction()
+                    .add(R.id.fragmentContainer, lmFrag)
+                    .commit()
+            } else {
+                // sign in first
+                createSignInIntent()
+            }
+        }
     }
 
     companion object {
