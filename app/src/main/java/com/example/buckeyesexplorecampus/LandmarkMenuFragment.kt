@@ -68,6 +68,34 @@ class LandmarkMenuFragment : Fragment() {
         fun onListFragmentInteraction(item: Landmark?)
     }
 
+    fun openCamera(landmarkId: String) {
+        val cameraFragment = CameraFragment()
+
+        val args = Bundle()
+        args.putString("landmarkId", landmarkId)
+        cameraFragment.arguments = args
+
+        fragmentManager
+            ?.beginTransaction()
+            ?.add(R.id.fragmentContainer, cameraFragment)
+//            ?.addToBackStack(null)
+            ?.commit()
+    }
+
+    // opens the facts fragment
+    fun openFacts(landmarkId: String) {
+        val factsFragment = FactsFragment()
+        val args = Bundle()
+        args.putString("landmarkId", landmarkId)
+        factsFragment.arguments = args
+
+        fragmentManager
+            ?.beginTransaction()
+            ?.replace(R.id.fragmentContainer, factsFragment)
+            ?.addToBackStack(null)
+            ?.commit()
+    }
+
     private fun retrieveLandmarks() {
         Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
         val list : ArrayList<Landmark> = ArrayList()
@@ -122,40 +150,6 @@ class LandmarkMenuFragment : Fragment() {
             .addOnFailureListener { exception ->
                 Log.d(TAG, "Get failed with exception", exception)
             }
-    }
-
-    fun openCamera(landmarkId: String) {
-        val cameraFragment = CameraFragment()
-
-        val args = Bundle()
-        args.putString("landmarkId", landmarkId)
-        cameraFragment.arguments = args
-
-        fragmentManager
-            ?.beginTransaction()
-            ?.add(R.id.fragmentContainer, cameraFragment)
-//            ?.addToBackStack(null)
-            ?.commit()
-    }
-
-    fun openFacts(landmarkId: String) {
-        val factsFragment = FactsFragment()
-
-        val args = Bundle()
-        args.putString("landmarkId", landmarkId)
-        factsFragment.arguments = args
-
-        fragmentManager
-            ?.beginTransaction()
-            ?.replace(R.id.fragmentContainer, factsFragment)
-            ?.addToBackStack(null)
-            ?.commit()
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        retrieveLandmarks()
     }
 }
 

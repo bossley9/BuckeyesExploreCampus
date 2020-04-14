@@ -109,6 +109,11 @@ class CameraFragment : Fragment() {
                     ?.beginTransaction()
                     ?.replace(R.id.fragmentContainer, factsFragment)
                     ?.commit()
+                //                ?.beginTransaction()
+//                ?.replace(R.id.fragmentContainer, landmarkMenuFragment)
+//                ?.addToBackStack(null)
+//                ?.commit()
+
             }
             .addOnFailureListener { e ->
                 Log.d("Firebase Add", "Error adding picture", e)
