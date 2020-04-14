@@ -30,6 +30,9 @@ class FactsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_facts, container, false)
 
+        val store = Store.instance()
+        Toast.makeText(activity, "store uid is " + store.getUser()?.id, Toast.LENGTH_LONG).show()
+
         // landmark id
         landmarkId = arguments!!.getString("landmarkId") as String
 
@@ -88,7 +91,6 @@ class FactsFragment : Fragment() {
 
                         val userImageBase64 = successfulLandmarks[landmarkId]
                         if (userImageBase64 != null) {
-                            Toast.makeText(activity, "opening facts for landmark " + landmarkId, Toast.LENGTH_LONG).show()
                             val imageBitMap: Bitmap? = decodeFromFirebaseBase64(userImageBase64)
                             userLandmarkImage.setImageBitmap(imageBitMap)
                         }

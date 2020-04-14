@@ -100,13 +100,20 @@ class LandmarkMenuFragment : Fragment() {
         Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
         val list : ArrayList<Landmark> = ArrayList()
 
+        var userId = FirebaseAuth.getInstance().currentUser?.uid as String
+
+        // TEMP set store user
+        var store = Store.instance()
+        store.setUser(userId)
+        Toast.makeText(activity, "user set in store.", Toast.LENGTH_SHORT).show()
+
         // TODO use promises
         db.collection("landmarks")
             .get()
             .addOnSuccessListener { landmarks ->
 
                 db.collection("users")
-                    .document(FirebaseAuth.getInstance().currentUser?.uid as String)
+                    .document(userId)
                     .get()
                     .addOnSuccessListener { user ->
 
