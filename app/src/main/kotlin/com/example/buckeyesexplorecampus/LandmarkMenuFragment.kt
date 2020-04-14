@@ -97,66 +97,10 @@ class LandmarkMenuFragment : Fragment() {
     }
 
     private fun retrieveLandmarks() {
-        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
-        val list : ArrayList<Landmark> = ArrayList()
+//        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
 
-        var userId = FirebaseAuth.getInstance().currentUser?.uid as String
-
-        // TEMP set store user
-        var store = Store.instance()
-        store.setUser(userId)
-        Toast.makeText(activity, "user set in store.", Toast.LENGTH_SHORT).show()
-
-        // TODO use promises
-        db.collection("landmarks")
-            .get()
-            .addOnSuccessListener { landmarks ->
-
-                db.collection("users")
-                    .document(userId)
-                    .get()
-                    .addOnSuccessListener { user ->
-
-                        val data = user.get("successfulLandmarks") as HashMap<*, *>?;
-                        val successfulLandmarks = HashMap<String, String>();
-
-                        if (data != null) {
-                            for ((k, v) in data) {
-                                successfulLandmarks[k as String] = v as String
-                            }
-                        }
-
-                        for (doc in landmarks) {
-                            val name: String? = doc.get("name") as String?
-                            val fact: String? = doc.get("fact") as String?
-                            val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
-                            val lat: Double? = geopoint?.latitude
-                            val long: Double? = geopoint?.longitude
-                            val imgBase64: String? = doc.get("imgBase64") as String?
-
-                            if (name != null &&
-                                fact != null &&
-                                lat != null &&
-                                long != null &&
-                                imgBase64 != null) {
-
-                                // if already completed, mark as completed
-                                val isCompleted = successfulLandmarks.containsKey(doc.id)
-
-                                val item = Landmark(doc.id, name, fact, lat, long, imgBase64, isCompleted)
-                                list.add(item)
-                            }
-                        }
-
-                        rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.d(TAG, "Get failed with exception", exception)
-                    }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "Get failed with exception", exception)
-            }
+        val store = Store.instance()
+        rv.adapter = LandmarkRecyclerViewAdapter(store.landmarks, listener, this)
     }
 }
 

@@ -20,19 +20,25 @@ class MainActivity : FragmentActivity() {
         // TODO if not online
 
         if (isSignedIn()) {
-            // connect signed in user to data in Firestore
-            findOrCreateUserObj()
+            val store = Store.instance()
 
-            // create main screen fragment
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragmentContainer, LandmarkMenuFragment())
-                .commit()
-        } else {
-            // sign in first
-            createSignInIntent()
+            store.setDataWithCallback(
+                FirebaseAuth.getInstance().currentUser?.uid,
+                createMainScreen
+            )
+
         }
 
+        else createSignInIntent() // sign in first!
+
+    }
+
+    private val createMainScreen = {
+        // create main screen fragment
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.fragmentContainer, LandmarkMenuFragment())
+            .commit()
     }
 
     private fun isSignedIn() : Boolean {
