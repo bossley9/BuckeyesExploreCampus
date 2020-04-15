@@ -35,6 +35,9 @@ class LandmarkMenuFragment : Fragment() {
         // recycler view
         rv = view.findViewById(R.id.recyclerView) as RecyclerView
 
+        // updates
+        retrieveLandmarks()
+
         rv.setHasFixedSize(true)
         rv.layoutManager = GridLayoutManager(context, columnCount)
 
@@ -68,62 +71,6 @@ class LandmarkMenuFragment : Fragment() {
         fun onListFragmentInteraction(item: Landmark?)
     }
 
-    private fun retrieveLandmarks() {
-        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
-        val list : ArrayList<Landmark> = ArrayList()
-
-        // TODO use promises
-        db.collection("landmarks")
-            .get()
-            .addOnSuccessListener { landmarks ->
-
-                db.collection("users")
-                    .document(FirebaseAuth.getInstance().currentUser?.uid as String)
-                    .get()
-                    .addOnSuccessListener { user ->
-
-                        val data = user.get("successfulLandmarks") as HashMap<*, *>?;
-                        val successfulLandmarks = HashMap<String, String>();
-
-                        if (data != null) {
-                            for ((k, v) in data) {
-                                successfulLandmarks[k as String] = v as String
-                            }
-                        }
-
-                        for (doc in landmarks) {
-                            val name: String? = doc.get("name") as String?
-                            val fact: String? = doc.get("fact") as String?
-                            val geopoint: GeoPoint? = doc.get("location") as GeoPoint?
-                            val lat: Double? = geopoint?.latitude
-                            val long: Double? = geopoint?.longitude
-                            val imgBase64: String? = doc.get("imgBase64") as String?
-
-                            if (name != null &&
-                                fact != null &&
-                                lat != null &&
-                                long != null &&
-                                imgBase64 != null) {
-
-                                // if already completed, mark as completed
-                                val isCompleted = successfulLandmarks.containsKey(doc.id)
-
-                                val item = Landmark(doc.id, name, fact, lat, long, imgBase64, isCompleted)
-                                list.add(item)
-                            }
-                        }
-
-                        rv.adapter = LandmarkRecyclerViewAdapter(list, listener, this)
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.d(TAG, "Get failed with exception", exception)
-                    }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "Get failed with exception", exception)
-            }
-    }
-
     fun openCamera(landmarkId: String) {
         val cameraFragment = CameraFragment()
 
@@ -133,14 +80,14 @@ class LandmarkMenuFragment : Fragment() {
 
         fragmentManager
             ?.beginTransaction()
-            ?.add(R.id.fragmentContainer, cameraFragment)
-//            ?.addToBackStack(null)
+            ?.replace(R.id.fragmentContainer, cameraFragment)
+            ?.addToBackStack(null)
             ?.commit()
     }
 
+    // opens the facts fragment
     fun openFacts(landmarkId: String) {
         val factsFragment = FactsFragment()
-
         val args = Bundle()
         args.putString("landmarkId", landmarkId)
         factsFragment.arguments = args
@@ -152,6 +99,15 @@ class LandmarkMenuFragment : Fragment() {
             ?.commit()
     }
 
+    private fun retrieveLandmarks() {
+//        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
+
+        val landmarks = Store.instance().landmarks
+        val size = landmarks.filter { it.hasBeenCompleted == true }.size
+//        Toast.makeText(activity, "completed landmarks: " + size + "/" + landmarks.size, Toast.LENGTH_SHORT).show()
+
+        rv.adapter = LandmarkRecyclerViewAdapter(landmarks, listener, this)
+    }
 
     override fun onResume() {
         super.onResume()
