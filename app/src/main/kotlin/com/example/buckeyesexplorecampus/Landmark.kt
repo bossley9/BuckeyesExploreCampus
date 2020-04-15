@@ -8,5 +8,7 @@ class Landmark(val id: String,
                val imgBase64: String,
                val isCompleted: Boolean) {
 
+    var hasBeenCompleted = !!isCompleted
+
     override fun toString(): String = id
 }

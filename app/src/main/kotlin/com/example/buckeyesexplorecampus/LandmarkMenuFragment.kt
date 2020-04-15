@@ -35,6 +35,9 @@ class LandmarkMenuFragment : Fragment() {
         // recycler view
         rv = view.findViewById(R.id.recyclerView) as RecyclerView
 
+        // updates
+        retrieveLandmarks()
+
         rv.setHasFixedSize(true)
         rv.layoutManager = GridLayoutManager(context, columnCount)
 
@@ -77,8 +80,8 @@ class LandmarkMenuFragment : Fragment() {
 
         fragmentManager
             ?.beginTransaction()
-            ?.add(R.id.fragmentContainer, cameraFragment)
-//            ?.addToBackStack(null)
+            ?.replace(R.id.fragmentContainer, cameraFragment)
+            ?.addToBackStack(null)
             ?.commit()
     }
 
@@ -99,8 +102,16 @@ class LandmarkMenuFragment : Fragment() {
     private fun retrieveLandmarks() {
 //        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
 
-        val store = Store.instance()
-        rv.adapter = LandmarkRecyclerViewAdapter(store.landmarks, listener, this)
+        val landmarks = Store.instance().landmarks
+        val size = landmarks.filter { it.hasBeenCompleted == true }.size
+//        Toast.makeText(activity, "completed landmarks: " + size + "/" + landmarks.size, Toast.LENGTH_SHORT).show()
+
+        rv.adapter = LandmarkRecyclerViewAdapter(landmarks, listener, this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        retrieveLandmarks()
     }
 }
 

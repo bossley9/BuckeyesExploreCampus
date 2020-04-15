@@ -60,8 +60,8 @@ class CameraFragment : Fragment() {
         }
     }
 
+    // TODO implement image comparison
     private fun isValidImage(img: Bitmap): Boolean {
-        // TODO implement image comparison
         return true
     }
 
@@ -103,16 +103,39 @@ class CameraFragment : Fragment() {
             .document(user?.uid as String)
             .set(data, SetOptions.merge())
             .addOnSuccessListener { _ ->
-                val factsFragment = FactsFragment()
 
-                fragmentManager
-                    ?.beginTransaction()
-                    ?.replace(R.id.fragmentContainer, factsFragment)
-                    ?.commit()
-                //                ?.beginTransaction()
-//                ?.replace(R.id.fragmentContainer, landmarkMenuFragment)
-//                ?.addToBackStack(null)
-//                ?.commit()
+                // write changes to store
+                val store = Store.instance()
+                val user = store.user
+
+                if (user != null) {
+                    user.successfulLandmarks.put(landmarkId, imgEncoded)
+
+                    val landmark = store.landmarks.find { it.id == landmarkId }
+                    if (landmark != null) {
+                        var index = store.landmarks.indexOf(landmark)
+                        store.landmarks[index].hasBeenCompleted = true
+
+                        Toast.makeText(activity, "adding successful landmark...", Toast.LENGTH_LONG).show()
+
+                        val factsFragment = FactsFragment()
+
+                        val args = Bundle()
+                        args.putString("landmarkId", landmarkId)
+                        factsFragment.arguments = args
+
+                        fragmentManager
+                            ?.popBackStack()
+
+                        fragmentManager
+                            ?.beginTransaction()
+                            ?.replace(R.id.fragmentContainer, factsFragment)
+                            ?.addToBackStack("")
+                            ?.commit()
+
+                    }
+
+                }
 
             }
             .addOnFailureListener { e ->

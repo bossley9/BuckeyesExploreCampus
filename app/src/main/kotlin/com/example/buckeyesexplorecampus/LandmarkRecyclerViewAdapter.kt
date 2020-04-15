@@ -51,7 +51,7 @@ class LandmarkRecyclerViewAdapter(
         val item = mValues[position]
         holder.mIdView.text = item.name
 
-        if (item.isCompleted) {
+        if (item.hasBeenCompleted) {
             holder.mContentView.text = "completed!"
         } else {
             holder.mContentView.text = "this loc is __ mi away"
@@ -60,7 +60,7 @@ class LandmarkRecyclerViewAdapter(
         holder.mImagePreview.setOnClickListener {
             val parent : LandmarkMenuFragment = mParentFragment as LandmarkMenuFragment
 
-            if (item.isCompleted) {
+            if (item.hasBeenCompleted) {
                 parent.openFacts(item.id)
             } else {
                 parent.openCamera(item.id)
