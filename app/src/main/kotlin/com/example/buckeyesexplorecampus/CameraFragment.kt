@@ -83,78 +83,31 @@ class CameraFragment : Fragment() {
         }
     }
 
+    val callback = {
+        val factsFragment = FactsFragment()
+
+        val args = Bundle()
+        args.putString("landmarkId", landmarkId)
+        factsFragment.arguments = args
+
+        fragmentManager
+            ?.popBackStack()
+
+        fragmentManager
+            ?.beginTransaction()
+            ?.replace(R.id.fragmentContainer, factsFragment)
+            ?.addToBackStack("")
+            ?.commit()
+    }
+
     private fun addSuccessfulLandmark(bitmap: Bitmap) {
-        // encode image
-        val imgEncoded: String = encodeBitmap(bitmap)
+        val store = Store.instance()
+        val user = store.user
 
-        // get user
-        val user = FirebaseAuth.getInstance().currentUser
-
-        // create map pair from landmark id to encoded image
-        val data = hashMapOf(
-            "successfulLandmarks" to hashMapOf(
-                landmarkId to imgEncoded
-            )
-        )
-
-        // push to Firebase
-        val db = FirebaseFirestore.getInstance()
-        db.collection("users")
-            .document(user?.uid as String)
-            .set(data, SetOptions.merge())
-            .addOnSuccessListener { _ ->
-
-                // write changes to store
-                val store = Store.instance()
-                val user = store.user
-
-                if (user != null) {
-                    user.successfulLandmarks.put(landmarkId, imgEncoded)
-
-                    val landmark = store.landmarks.find { it.id == landmarkId }
-                    if (landmark != null) {
-                        var index = store.landmarks.indexOf(landmark)
-                        store.landmarks[index].hasBeenCompleted = true
-
-                        Toast.makeText(activity, "adding successful landmark...", Toast.LENGTH_LONG).show()
-
-                        val factsFragment = FactsFragment()
-
-                        val args = Bundle()
-                        args.putString("landmarkId", landmarkId)
-                        factsFragment.arguments = args
-
-                        fragmentManager
-                            ?.popBackStack()
-
-                        fragmentManager
-                            ?.beginTransaction()
-                            ?.replace(R.id.fragmentContainer, factsFragment)
-                            ?.addToBackStack("")
-                            ?.commit()
-
-                    }
-
-                }
-
-            }
-            .addOnFailureListener { e ->
-                Log.d("Firebase Add", "Error adding picture", e)
-            }
+        if (user != null) {
+            user.addSuccessfulLandmark(landmarkId, bitmap, callback)
+        }
     }
 
-    // given a bitmap, encode and convert to a string
-    private fun encodeBitmap(bitmap: Bitmap): String {
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-        return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
-    }
 
-    // given a string?, decode and convert to a bitmap?
-    @Throws(IOException::class)
-    fun decodeBitmap(image: String?): Bitmap? {
-        val decodedByteArray =
-            Base64.decode(image, Base64.DEFAULT)
-        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)
-    }
 }

@@ -4,6 +4,12 @@ import android.content.ContentValues
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.FirebaseFirestore
+import android.graphics.Bitmap
+import java.io.ByteArrayOutputStream
+import android.util.Base64
+import java.io.IOException
+import android.graphics.BitmapFactory
+import com.google.firebase.firestore.SetOptions
 
 //
 // user class
@@ -19,6 +25,50 @@ class User(
         // TODO return location of user
     }
 
+    fun addSuccessfulLandmark(landmarkId: String, bitmap: Bitmap, callback: () -> Int?) {
+        // encode image
+        val imgEncoded: String = Store.encodeBitmap(bitmap)
+
+
+
+        // create map pair from landmark id to encoded image
+        val data = hashMapOf(
+            "successfulLandmarks" to hashMapOf(
+                landmarkId to imgEncoded
+            )
+        )
+
+        // push to Firebase
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users")
+            .document(id)
+            .set(data, SetOptions.merge())
+            .addOnSuccessListener { _ ->
+
+                // write changes to store
+                val store = Store.instance()
+                val user = store.user
+
+                if (user != null) {
+                    user.successfulLandmarks.put(landmarkId, imgEncoded)
+
+                    val landmark = store.landmarks.find { it.id == landmarkId }
+                    if (landmark != null) {
+                        var index = store.landmarks.indexOf(landmark)
+                        store.landmarks[index].hasBeenCompleted = true
+
+                        callback()
+
+                    }
+
+                }
+
+            }
+            .addOnFailureListener { e ->
+                Log.d("Firebase Add", "Error adding picture", e)
+            }
+    }
+
     override fun toString(): String = id
 }
 
@@ -29,14 +79,31 @@ class User(
 class Store {
     private val db = FirebaseFirestore.getInstance()
 
-    // instance
-
     companion object {
+
+        // instance
+
         private var instance: Store? = null
         fun instance(): Store {
             if (instance == null) instance = Store()
             return instance as Store
         }
+
+        // given a bitmap, encode and convert to a string
+        fun encodeBitmap(bitmap: Bitmap): String {
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+            return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
+        }
+
+        // given a string?, decode and convert to a bitmap?
+        @Throws(IOException::class)
+        fun decodeBitmap(image: String?): Bitmap? {
+            val decodedByteArray =
+                Base64.decode(image, Base64.DEFAULT)
+            return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)
+        }
+
     }
 
     // set main store data
