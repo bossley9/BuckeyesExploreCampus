@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
-
+import android.app.FragmentTransaction
 
 /**
  * The main screen fragment.
@@ -81,6 +81,7 @@ class LandmarkMenuFragment : Fragment() {
 
         fragmentManager
             ?.beginTransaction()
+            ?.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             ?.replace(R.id.fragmentContainer, cameraFragment)
             ?.addToBackStack(null)
             ?.commit()
@@ -95,18 +96,14 @@ class LandmarkMenuFragment : Fragment() {
 
         fragmentManager
             ?.beginTransaction()
+            ?.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             ?.replace(R.id.fragmentContainer, factsFragment)
             ?.addToBackStack(null)
             ?.commit()
     }
 
     private fun retrieveLandmarks() {
-//        Toast.makeText(activity, "Retrieving landmarks...", Toast.LENGTH_SHORT).show()
-
         val landmarks = Store.instance().landmarks
-        val size = landmarks.filter { it.hasBeenCompleted == true }.size
-//        Toast.makeText(activity, "completed landmarks: " + size + "/" + landmarks.size, Toast.LENGTH_SHORT).show()
-
         rv.adapter = LandmarkRecyclerViewAdapter(landmarks, listener, this)
     }
 
