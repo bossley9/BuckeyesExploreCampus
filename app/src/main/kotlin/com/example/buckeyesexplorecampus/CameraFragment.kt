@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,7 +20,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-
+import android.R.attr.data
+import androidx.core.app.ActivityCompat.startActivityForResult
+import android.provider.MediaStore
+import android.os.Environment.getExternalStorageDirectory
+import android.R.attr.bitmap
+import android.R.attr.data
 
 /**
  * A [Fragment] subclass which displays the camera.
@@ -50,7 +54,13 @@ class CameraFragment : Fragment() {
         return view
     }
 
-    private fun startCameraIntent() {
+     fun startCameraIntent() {
+/*
+         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+         startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+*/
+
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             activity?.packageManager?.let {
                 takePictureIntent.resolveActivity(it)?.also {
@@ -58,7 +68,8 @@ class CameraFragment : Fragment() {
                 }
             }
         }
-    }
+
+     }
 
     // TODO implement image comparison
     private fun isValidImage(img: Bitmap): Boolean {
@@ -80,6 +91,8 @@ class CameraFragment : Fragment() {
                 }
 
             }
+        } else {
+            fragmentManager?.popBackStack()
         }
     }
 

@@ -39,6 +39,7 @@ class LandmarkMenuFragment : Fragment() {
         retrieveLandmarks()
 
         rv.setHasFixedSize(true)
+        rv.setItemViewCacheSize(20)
         rv.layoutManager = GridLayoutManager(context, columnCount)
 
         // retrieve landmarks
