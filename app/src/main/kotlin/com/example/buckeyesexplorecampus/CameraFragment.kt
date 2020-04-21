@@ -73,7 +73,8 @@ class CameraFragment : Fragment() {
 
     // TODO implement image comparison
     private fun isValidImage(img: Bitmap): Boolean {
-        return true
+        val str = Store.encodeBitmap(img)
+        return str != "1"
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -46,18 +46,6 @@ class MainActivity : FragmentActivity() {
         return user != null
     }
 
-    // TODO method unecessary?
-    private fun findOrCreateUserObj() {
-        val db = FirebaseFirestore.getInstance()
-        val users = db.collection("users")
-
-        val user = FirebaseAuth.getInstance().currentUser
-
-        // create user obj if it does not exist
-//        val data = hashMapOf("successfulLandmarks" to hashMapOf<String, String>())
-//        users.document(user?.uid as String).set(data, SetOptions.merge())
-    }
-
     private fun createSignInIntent() {
         // Choose authentication providers
         val providers = arrayListOf(

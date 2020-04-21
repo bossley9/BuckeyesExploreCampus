@@ -45,8 +45,9 @@ class FactsFragment : Fragment() {
 
         val landmark: Landmark? = store.landmarks.find { it.id == landmarkId }
 
-        val imageBitMap : Bitmap? = decodeFromFirebaseBase64(landmark?.imgBase64)
-        providedLandmarkImage.setImageBitmap(imageBitMap)
+        providedLandmarkImage.setImageBitmap(
+            Store.decodeBitmap(landmark?.imgBase64)
+        )
 
         landmarkTitleText.text = landmark?.name
         landmarkFactText.text = landmark?.fact
@@ -58,19 +59,11 @@ class FactsFragment : Fragment() {
         if (successfulLandmarks != null) {
             val userImageBase64 = successfulLandmarks[landmarkId]
             if (userImageBase64 != null) {
-                val imageBitMap: Bitmap? = decodeFromFirebaseBase64(userImageBase64)
-                userLandmarkImage.setImageBitmap(imageBitMap)
+                userLandmarkImage.setImageBitmap(Store.decodeBitmap(userImageBase64))
             }
         }
 
         return view
-    }
-
-    @Throws(IOException::class)
-    fun decodeFromFirebaseBase64(image: String?): Bitmap? {
-        val decodedByteArray =
-            Base64.decode(image, Base64.DEFAULT)
-        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)
     }
 
 }
